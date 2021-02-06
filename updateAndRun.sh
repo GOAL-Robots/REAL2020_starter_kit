@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-container_seed=$1
+container_seed=$RANDOM
 commit_pyrep=f538303
 commit_realrobots=PyRep
 
