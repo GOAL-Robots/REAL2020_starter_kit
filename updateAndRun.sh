@@ -2,7 +2,7 @@
 set -e
 
 container_seed=$RANDOM
-commit_pyrep=5e248a1
+commit_pyrep=WithRestrictedGoals
 commit_realrobots=PyRep
 
 echo "********"
