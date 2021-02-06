@@ -20,10 +20,10 @@ echo "******"
 echo "Starting Simulation"
 Xvfb :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset &
 export DISPLAY=:99
-roscore > roscore${container_seed}.log &
-python3 /root/pyrepgym/simlaunch.py > simlaunch${container_seed}.log &
+roscore &> roscore${container_seed}.log &
+python3 /root/pyrepgym/simlaunch.py &> simlaunch${container_seed}.log &
 sleep 30
-python3 /root/pyrepgym/imageGenerator.py > imagegenerator${container_seed}.log &
+python3 /root/pyrepgym/imageGenerator.py &> imagegenerator${container_seed}.log &
 sleep 30
-python3 local_evaluation.py > simulation${container_seed}.log
+python3 local_evaluation.py &> simulation${container_seed}.log
 
