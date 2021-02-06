@@ -2,7 +2,7 @@
 set -e
 
 container_seed=$1
-commit_pyrep=WithRestrictedGoals
+commit_pyrep=5e248a1
 commit_realrobots=PyRep
 
 echo "*******"
@@ -25,5 +25,5 @@ python3 /root/pyrepgym/simlaunch.py > simlaunch${container_seed}.log &
 sleep 30
 python3 /root/pyrepgym/imageGenerator.py > imagegenerator${container_seed}.log &
 sleep 30
-python3 local_evaluation.py
+python3 local_evaluation.py > simulation${container_seed}.log
 
