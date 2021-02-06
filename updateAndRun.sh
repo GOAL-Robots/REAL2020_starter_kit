@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
+container_seed=$1
 commit_pyrep=WithRestrictedGoals
 commit_realrobots=PyRep
 
-echo "Updating repositories"
+echo "\n\nUpdating repositories"
 
 cd /root/pyrepgym
 git pull
@@ -14,11 +15,11 @@ git pull
 git checkout $commit_realrobots
 cd /root/REAL2020_starter_kit
 
-echo "Starting Simulation"
-roscore > roslog.txt &
-python /root/pyrepgym/simlaunch.py &
+echo "\n\nStarting Simulation"
+roscore > roscore${container_seed}.log &
+python3 ./pyrepgym/simlaunch.py > simlaunch${container_seed}.log &
 sleep 30
-python /root/pyrepgym/imageGenerator.py &
+python3 ./pyrepgym/imageGenerator.py > imagegenerator${container_seed}.log &
 sleep 30
-python local_evaluation
+python3 local_evaluation.py
 
