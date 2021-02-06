@@ -5,6 +5,16 @@ container_seed=$RANDOM
 commit_pyrep=f538303
 commit_realrobots=PyRep
 
+echo "********"
+echo "Setting up variables"
+
+export COPPELIASIM_ROOT=/root/CoppeliaSim_Edu_V4_0_0_Ubuntu16_04
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COPPELIASIM_ROOT
+export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
+source ~/ias_ros/setup.bash
+source ~/catkin_ws/devel/setup.bash
+export QT_PLUGIN_PATH=$COPPELIASIM_ROOT
+
 echo "*******"
 echo "Updating repositories"
 
