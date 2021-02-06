@@ -7,8 +7,10 @@ commit_realrobots=PyRep
 echo "Updating repositories"
 
 cd /root/pyrepgym
+git pull
 git checkout $commit_pyrep
 cd /root/real_robots
+git pull
 git checkout $commit_realrobots
 cd /root/REAL2020_starter_kit
 
