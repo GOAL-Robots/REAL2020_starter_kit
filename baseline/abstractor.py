@@ -8,7 +8,6 @@ from tensorflow.keras import backend as K
 from tensorflow import keras
 import numpy as np
 import baseline.config as config
-import baseline.priorityQueue as pq
 import cv2
 
 # Set memory growth
@@ -216,7 +215,6 @@ class VAEAbstractor():
             self.encoder.save('trained_encoder')
             self.decoder.save('trained_decoder')
 
-
     def get_encoder(self):
         return self.encoder
 
@@ -274,57 +272,32 @@ class DynamicAbstractor():
             print("Each condition has to be a numpy.ndarray")
             return None
 
-        if config.abst['type'] == 'filtered_mask':
-            masks = [actions[i][2] for i in range(len(actions))]
-            ab = VAEAbstractor(masks, latent_dim=7 * config.abst['n_obj'])
-            self.encoder = ab.get_encoder()
+        images = [actions[i][2] for i in range(len(actions))]
+        print("Total images {} for VAE and BS".format(len(images)))
 
-            self.actions = []
-            n_cells = len(actions[0][0]) * len(actions[0][0][0])
-            post = np.array(self.encoder.predict(np.reshape(actions[0][0],
-                                                 [-1, n_cells]))[0][0])
+        self.cbsm = cv2.createBackgroundSubtractorMOG2(len(images))
+        for i in range(len(images)):
+            self.cbsm.apply(images[i])
 
-            reshaping = np.reshape(masks, [len(masks),
-                                           len(masks[0]) * len(masks[0][0])])
-            predictions = self.encoder.predict(reshaping)
+        images = [self.background_subtractor(img) for img in images]
 
-            for i in range(len(actions)):
-                pre = post
-                post = np.array(predictions[0][i])
-                self.actions += [np.array([pre, actions[i][1], post])]
+        ab = VAEAbstractor(images, latent_dim=7 * config.abst['n_obj'])
+        self.encoder = ab.get_encoder()
+        self.decoder = ab.get_decoder()
 
-            print(self.actions[0])
+        self.actions = []
+        n_cells = len(actions[0][0]) * len(actions[0][0][0])
 
-        elif config.abst['type'] == 'image':
-            images = [actions[i][2] for i in range(len(actions))]
-            print("Total images {} for VAE and BS".format(len(images)))
+        post = np.array(self.encoder.predict(np.reshape(self.background_subtractor(actions[0][0]), [-1, n_cells]))[0][0])
 
-            cbsm = cv2.createBackgroundSubtractorMOG2(len(images))
-            for i in range(len(images)):
-                cbsm.apply(images[i])
+        reshaping = np.reshape(images, [len(images), len(images[0]) * len(images[0][0])])
+        predictions = self.encoder.predict(reshaping)
 
-            self.background = cbsm.getBackgroundImage()
-            images = np.average(abs(images - self.background), axis=3) != 0
-
-            ab = VAEAbstractor(images, latent_dim=7 * config.abst['n_obj'])
-            self.encoder = ab.get_encoder()
-
-            self.actions = []
-            n_cells = len(actions[0][0]) * len(actions[0][0][0])
-
-            post = np.array(self.encoder.predict(np.reshape(np.average(abs(actions[0][0] - self.background), axis=2) != 0, [-1, n_cells]))[0][0])
-
-            reshaping = np.reshape(images, [len(images), len(images[0]) * len(images[0][0])])
-            predictions = self.encoder.predict(reshaping)
-
-            for i in range(len(actions)):
-                pre = post
-                post = np.array(predictions[0][i])
-                self.actions += [np.array([pre, actions[i][1], post])]
-            print(self.actions[0])
-
-        else:
-            self.actions = actions
+        for i in range(len(actions)):
+            pre = post
+            post = np.array(predictions[0][i])
+            self.actions += [np.array([pre, actions[i][1], post])]
+        print(self.actions[0])
 
         self.dictionary_abstract_actions = {}
 
@@ -333,17 +306,20 @@ class DynamicAbstractor():
         condition_dimension = len(self.actions[0][0])
         self.lists_significative_differences = [[] for i in range(condition_dimension)]
 
-        ordered_differences_queues = [pq.PriorityQueue() for i in range(condition_dimension)]
+        ordered_differences_queues = [[] for i in range(condition_dimension)]
 
         differences = abs(np.take(self.actions, 0, axis=1) - np.take(self.actions, 2, axis=1))
         for i in range(condition_dimension):
             for j in range(len(self.actions)):
-                ordered_differences_queues[i].enqueue(None, differences[j][i])
+                ordered_differences_queues[i] += [differences[j][i]]
+
+        for i in range(condition_dimension):
+            ordered_differences_queues[i].sort()
 
         actions_to_remove = int(np.floor(len(self.actions) * config.abst['percentage_of_actions_ignored_at_the_extremes']))
 
         for i in range(condition_dimension):
-            sup = ordered_differences_queues[i].get_queue_values()
+            sup = ordered_differences_queues[i]
             for j in np.linspace(actions_to_remove, len(self.actions) - 1 - actions_to_remove, config.abst['total_abstraction']).round(0):
                 self.lists_significative_differences[i] += [sup[int(j)]]
 
@@ -382,4 +358,4 @@ class DynamicAbstractor():
         return self.encoder
 
     def background_subtractor(self, img):
-        return abs(img - self.background)
+        return self.cbsm.apply(img, learningRate=0) != 0
