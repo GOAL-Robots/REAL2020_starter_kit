@@ -7,8 +7,8 @@ abstraction:
   pre_trained_vae: false
 planner:
   replan: true
-  try_random: true
-  type: noplan
+  try_random: false
+  type: mega
 exploration:
   action_size: 1
   action_parts_max: 1
