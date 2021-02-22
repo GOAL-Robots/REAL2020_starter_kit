@@ -8,7 +8,7 @@ abstraction:
 planner:
   replan: true
   try_random: false
-  type: mega
+  type: noplan
 exploration:
   action_size: 1
   action_parts_max: 1
