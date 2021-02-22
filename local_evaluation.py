@@ -9,14 +9,14 @@ import os
 #########################################################
 EVALUATION_ACTION_TYPE = 'macro_action'
 EVALUATION_N_OBJECTS = 1
-DATASET_PATH = "./data/allGoalsPyRepRestricted.npy.npz"
+DATASET_PATH = "./data/allGoalsPyRepRestrictedRos7cm.npy.npz"
 
 result, detailed_scores = real_robots.evaluate(
                 SubmittedPolicy,
                 environment='PyRep',
                 action_type=EVALUATION_ACTION_TYPE,
                 n_objects=EVALUATION_N_OBJECTS,
-                intrinsic_timesteps=15000,
+                intrinsic_timesteps=1500,
                 extrinsic_timesteps=5,
                 extrinsic_trials=50,
                 visualize=False,
