@@ -7,7 +7,7 @@ abstraction:
   pre_trained_vae: false
 planner:
   replan: true
-  try_random: false
+  try_random: true
   type: noplan
 exploration:
   action_size: 1
