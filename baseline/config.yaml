@@ -4,7 +4,7 @@ abstraction:
   n_obj: 1
   total_abstraction: 200
   percentage_of_actions_ignored_at_the_extremes: 0.0
-  pre_trained_vae: false
+  pre_trained_vae: true
 planner:
   replan: true
   try_random: false
@@ -14,10 +14,10 @@ exploration:
   action_parts_max: 1
   home_duration: 0
 simulation:
-  experience_data: filtered_transitions_365741.npy
+  experience_data: transitions_355428.npz
   compressed_data: true
   extrinsic_steps: 5
   save_images: true
   save_masks: false
   save_positions: true
-  use_experience_data: false
+  use_experience_data: true
