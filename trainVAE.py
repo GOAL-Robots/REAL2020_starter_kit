@@ -7,7 +7,13 @@ import cv2
 
 
 if __name__ == "__main__":
-    allActions = np.load(config.sim['experience_data'], allow_pickle=True).tolist()
+
+    if config.sim['compressed_data']:
+        allActions = np.load(config.sim['experience_data'],
+                             allow_pickle=True)['arr_0']
+    else:
+        allActions = np.load(config.sim['experience_data'],
+                             allow_pickle=True)
 
     allAbstractedActions = [[currentAbstraction(a[0]), a[1],
                              currentAbstraction(a[2])]
